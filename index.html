@@ -36,6 +36,10 @@ header{display:flex;justify-content:space-between;align-items:flex-end;padding-b
 .tab.on{color:var(--bg);background:var(--acc);border-color:var(--acc)}
 .tab[data-c="ip"].on{background:var(--ip);border-color:var(--ip)}
 .tab[data-c="fl"].on{background:var(--fl);border-color:var(--fl)}
+.tab[data-c="zp"].on{background:var(--gold);border-color:var(--gold)}
+.tab[data-c="kred"].on{background:var(--red);border-color:var(--red)}
+.tab[data-c="zp"] .d{background:var(--gold)}
+.tab[data-c="kred"] .d{background:var(--red)}
 .tab .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
 .tab[data-c="all"] .d{background:#fff}
 .tab[data-c="ooo"] .d{background:var(--ooo)}
@@ -85,6 +89,46 @@ tr:hover td{background:rgba(94,234,212,.03)}
 .tile .od{font-family:'JetBrains Mono';font-size:19px;font-weight:600;position:relative;z-index:1}
 .tile .od small{display:block;font-family:'Manrope';font-size:10px;color:var(--mut);font-weight:600;margin-top:3px}
 @media(max-width:1200px){.cgrid,.cgrid.c3{grid-template-columns:repeat(2,1fr)}}
+/* payment schedule squares */
+.leg{display:flex;gap:20px;margin-top:4px;font-size:11.5px;color:var(--mut);flex-wrap:wrap}
+.leg span{display:inline-flex;align-items:center;gap:7px}
+.leg i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.loan{background:rgba(255,255,255,.022);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-top:14px}
+.loan .ltop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.loan .ln{font-size:13.5px;font-weight:800;line-height:1.4}
+.loan .ln small{display:block;color:var(--mut);font-weight:600;font-size:11px;margin-top:3px}
+.loan .lod{text-align:right;font-family:'JetBrains Mono';font-size:18px;font-weight:600;color:var(--red)}
+.loan .lod small{display:block;font-family:'Manrope';font-size:10.5px;color:var(--mut);font-weight:600;margin-top:3px}
+.sched{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px}
+.sq{width:22px;height:22px;border-radius:5px;background:var(--red);opacity:.92;cursor:default;transition:transform .15s}
+.sq:hover{transform:scale(1.2)}
+.sq.paid{background:var(--grn)}
+.sq.over{background:var(--gold)}
+.lcap{font-size:11.5px;color:var(--mut);margin-top:13px}
+.lcap b{color:var(--txt)}
+.prog{height:7px;border-radius:99px;background:rgba(251,113,133,.25);margin-top:13px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--grn);border-radius:99px}
+/* платёжный календарь по месяцам */
+.cal{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.mo{flex:1 1 86px;border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center;background:rgba(251,113,133,.06)}
+.mo.now{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.mo .mlb{font-size:10px;color:var(--mut);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.mo .mv{font-family:'JetBrains Mono';font-size:13.5px;font-weight:600;margin-top:6px;color:#ffd7dd}
+.mo .mv small{display:block;font-size:9px;color:var(--dim);font-weight:600;margin-top:2px}
+.bignum{font-family:'JetBrains Mono'}
+/* матрица платежей: кредит × месяц */
+.mx{overflow-x:auto;margin-top:16px;padding-bottom:6px}
+.mxg{display:grid;grid-template-columns:130px repeat(19,minmax(26px,1fr));gap:11px 7px;min-width:740px}
+.mxh{font-size:9px;color:var(--dim);font-weight:700;text-align:center;line-height:1.15;align-self:end;padding-bottom:3px}
+.mxh.now{color:var(--gold)}
+.mxn{font-size:11px;font-weight:700;display:flex;flex-direction:column;justify-content:center;line-height:1.25;padding-right:6px}
+.mxn small{color:var(--mut);font-weight:600;font-size:9.5px;font-family:'JetBrains Mono'}
+.mxc{height:22px;border-radius:4px;background:rgba(255,255,255,.035)}
+.mxc.pay{background:var(--red);opacity:.88;cursor:pointer;transition:transform .12s,opacity .12s}
+.mxc.pay:hover{opacity:1;transform:scale(1.14)}
+.mxc.sel{outline:2px solid var(--gold);outline-offset:1px;opacity:1}
+.mxread{margin-top:14px;font-size:13px;color:var(--mut);min-height:20px}
+.mxread b{color:var(--gold);font-family:'JetBrains Mono'}
 .total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(251,113,133,.08),rgba(251,191,36,.08));border:1px solid rgba(251,113,133,.25)}
 .total b{font-family:'JetBrains Mono';font-size:20px;color:var(--gold)}
 .total.pos{background:rgba(94,234,212,.06);border-color:rgba(94,234,212,.22)}
@@ -115,6 +159,8 @@ tr:hover td{background:rgba(94,234,212,.03)}
   <div class="tab" data-c="ooo"><span class="d"></span>ООО</div>
   <div class="tab" data-c="ip"><span class="d"></span>ИП</div>
   <div class="tab" data-c="fl"><span class="d"></span>Личное</div>
+  <div class="tab" data-c="zp"><span class="d"></span>Долги ЗП</div>
+  <div class="tab" data-c="kred"><span class="d"></span>Кредиты</div>
 </div>
 
 <!-- ============ СВОДНО ============ -->
@@ -127,7 +173,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
         <div class="acct"><span>Дебиторка (нам должны)</span><span class="num">4 307 660</span></div>
         <div class="acct"><span>Кредиторка (перевозчикам, 48)</span><span class="num dn">3 534 500</span></div>
         <div class="acct"><span>Долг по ЗП сотрудникам</span><span class="num dn">~210 000</span></div>
-        <div class="acct"><span>Банк-долг (Поток 1,4 + оборотн. 3,27)</span><span class="num dn">~4,67 млн</span></div>
+        <div class="acct"><span>Банк-долг (оборотн. 3,15 + Поток 1,27)</span><span class="num dn">~4,42 млн</span></div>
       </div>
     </div>
     <div class="panel">
@@ -172,17 +218,18 @@ tr:hover td{background:rgba(94,234,212,.03)}
         <tr><td>Перевозчики</td><td class="num">1 527 000</td></tr>
         <tr><td>Прочие расходы</td><td class="num">634 665</td></tr>
         <tr><td>Кредиты (погашение овердрафта)</td><td class="num">567 552</td></tr>
-        <tr><td>Дивиденды (изъятия владельца)</td><td class="num">566 016</td></tr>
+        <tr><td><b>Заработная плата</b></td><td class="num">326 379</td></tr>
+        <tr><td>Дивиденды (изъятия владельца)</td><td class="num">251 016</td></tr>
         <tr><td>Налоги ЕНП</td><td class="num">161 674</td></tr>
         <tr><td>Банковские услуги</td><td class="num">157 772</td></tr>
-        <tr><td class="muted">… прочее (консалтинг, юр., ГСМ, связь…)</td><td class="num muted">301 723</td></tr>
+        <tr><td class="muted">… прочее (консалтинг, АТИ, юр., поверка…)</td><td class="num muted">290 343</td></tr>
       </table>
       <div class="total"><span>ИТОГО расходы</span><b>3 916 402</b></div>
     </div>
   </div>
   <div class="panel" style="margin-bottom:14px">
     <div class="row big" style="border-top:none;padding-top:0;margin-top:0"><span><b>Сальдо июня (кэш, доход − расход)</b></span><span class="num up"><b>+235 536</b></span></div>
-    <div class="note">Чистый управленческий учёт из УУ-таблицы (без внутренних переводов 158к). Если убрать финансовое (овердрафт: займы 654к − погашение 568к) и изъятия владельца (дивиденды 566к), <b>операционная прибыль июня ≈ +0,7 млн</b>. По мере заноса следующих месяцев здесь появится помесячная динамика в чистых цифрах.</div>
+    <div class="note">Чистый управленческий учёт из УУ-таблицы (без внутренних переводов 158к). <b>Зарплата (326к)</b> выведена отдельной строкой — выделена из «дивидендов» по факту выплат команде. Метод кассовый: июньские выплаты включают закрытие долгов по ЗП за май/апрель (по периодам не разносим). Если убрать финансовое (овердрафт: займы 654к − погашение 568к) и реальные изъятия владельца (дивиденды 251к), <b>операционная прибыль июня ≈ +0,4 млн</b>. По мере заноса следующих месяцев здесь появится помесячная динамика в чистых цифрах.</div>
   </div>
 
   <div class="grid wide">
@@ -208,7 +255,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
     <div class="card"><div class="lbl"><span class="dot"></span>Касса сейчас</div><div class="val up">335 335</div><div class="sub">3 счёта · на 01.06 было 54 560</div></div>
     <div class="card"><div class="lbl"><span class="dot"></span>Дебиторка</div><div class="val">4,31 млн</div><div class="sub">21 клиент · нам должны</div></div>
     <div class="card"><div class="lbl"><span class="dot"></span>Кредиторка</div><div class="val dn">3,53 млн</div><div class="sub">48 перевозчиков</div></div>
-    <div class="card"><div class="lbl"><span class="dot"></span>Банк-долг</div><div class="val dn">~1,4 млн</div><div class="sub">Поток + оборотн. кредит (?)</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>Банк-долг</div><div class="val dn">~4,4 млн</div><div class="sub">оборотн. 3,15 + Поток 1,27</div></div>
   </div>
 
   <div class="grid">
@@ -254,7 +301,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
       <h3>Обязательства ООО <span class="hint">долги банкам / бюджету</span></h3>
       <div class="cgrid c3">
         <div class="tile"><div class="nm">Заём Поток<small>№3676988 · до 02.2028</small></div><div class="od">~1,4 млн<small>98,5 тыс/мес · был штраф 29 867</small></div></div>
-        <div class="tile"><div class="nm">Оборотный кредит<small>Т-Банк · до 11.03.2027</small></div><div class="od dn">3,27 млн<small>475 580/мес · погашено 1,05 из 4,2 млн</small></div></div>
+        <div class="tile"><div class="nm">Оборотный кредит<small>Т-Банк · до 11.03.2027</small></div><div class="od dn">3,27 млн<small>475 580/мес · до 11.03.2027</small></div></div>
         <div class="tile"><div class="nm">НДС + страх. взносы<small>осталось 2 части из 3</small></div><div class="od muted">часть<small>+ страхование грузов ~60 тыс</small></div></div>
       </div>
       <div class="note">Аренда офиса за июнь ~35 тыс (делится с ИП) ещё не оплачена.</div>
@@ -365,6 +412,73 @@ tr:hover td{background:rgba(94,234,212,.03)}
   </div>
 </div>
 
+<!-- ============ ДОЛГИ ЗП ============ -->
+<div class="view" id="v-zp">
+  <div class="kpis">
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--grn);box-shadow:0 0 10px var(--grn)"></span>Выплачено за июнь</div><div class="val up">315 354</div><div class="sub">офиц. 125 437 + «на карту» 189 917</div></div>
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--red);box-shadow:0 0 10px var(--red)"></span>Долг по ЗП</div><div class="val dn">~210 000</div><div class="sub">Таня, Маша, Лариса — не закрыто</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>ФОТ в месяц</div><div class="val">~315 тыс</div><div class="sub">офиц. 125к + «на карту» 190к</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>В штате</div><div class="val">9 чел.</div><div class="sub">+ аутсорс (юристы, бух, СБ)</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Зарплата по сотрудникам — ИЮНЬ <span class="hint">офиц. (Список получателей №22 от 10.06) + неофиц. «на карту» · ₽<br>долги — регулярная часть, юрлицо неважно</span></h3>
+    <table>
+      <tr><th>Сотрудник</th><th style="text-align:right">Официально</th><th style="text-align:right">На карту</th><th style="text-align:right">Долг</th></tr>
+      <tr><td>Бурдин Дмитрий</td><td class="num">10 531</td><td class="num">49 723</td><td class="num muted">—</td></tr>
+      <tr><td>Бабанова Елена</td><td class="num">10 531</td><td class="num">62 428</td><td class="num muted">—</td></tr>
+      <tr><td>Мистрякова Линда</td><td class="num">23 687</td><td class="num muted">—</td><td class="num muted">—</td></tr>
+      <tr><td>Сидоркина Марина</td><td class="num">14 744</td><td class="num muted">—</td><td class="num muted">—</td></tr>
+      <tr><td>Тукшумский Василий</td><td class="num">13 165</td><td class="num">5 263</td><td class="num muted">—</td></tr>
+      <tr><td>Лобанов Александр</td><td class="num muted">—</td><td class="num">52 503</td><td class="num muted">—</td></tr>
+      <tr><td>Уральская Татьяна</td><td class="num">6 205</td><td class="num">10 000</td><td class="num dn">~90 000</td></tr>
+      <tr><td>Абраменко Мария</td><td class="num">20 240</td><td class="num">10 000</td><td class="num dn">~70 000</td></tr>
+      <tr><td>Цурпаль Лариса</td><td class="num">26 333</td><td class="num muted">—</td><td class="num dn">~50 000</td></tr>
+      <tr style="border-top:2px solid var(--line)"><td><b>ИТОГО</b></td><td class="num"><b>125 437</b></td><td class="num"><b>189 917</b></td><td class="num dn"><b>~210 000</b></td></tr>
+    </table>
+  </div>
+
+  <div class="grid wide">
+    <div class="panel">
+      <h3>Долг по ЗП — кому должны <span class="hint">сводно, юрлицо неважно</span></h3>
+      <div class="ent">
+        <div class="acct"><span>Уральская Татьяна</span><span class="num dn">~90 000</span></div>
+        <div class="acct"><span>Абраменко Мария</span><span class="num dn">~70 000</span></div>
+        <div class="acct"><span>Цурпаль Лариса</span><span class="num dn">~50 000</span></div>
+        <div class="acct" style="border-color:rgba(251,113,133,.3)"><span><b>ИТОГО долг по ЗП</b></span><span class="num dn"><b>~210 000</b></span></div>
+      </div>
+      <div class="note">Цифры по неофиц. части — со слов Эльвиры; полный пофамильный список долгов уточняется. Долги — регулярные (тянутся с прошлых месяцев), а не разовые.</div>
+    </div>
+    <div class="panel">
+      <h3>Как устроена выплата ЗП</h3>
+      <div class="note" style="margin-top:14px">Зарплата идёт <b>двумя потоками</b>: официальная (~125к, через банк по Списку №22, 10-го числа) + неофициальная «на карту» (~190к, переводами с личных карт Эльвиры). Поэтому в учёте ЗП почти не видна как «Заработная плата» — она выходила как переводы Эльвире (раньше — «дивиденды»). <b>19.06 свели:</b> 315к этих переводов переведены в статью «Заработная плата». Фактический источник денег — личные/кредитные карты Эльвиры. Перед сотрудниками висит <b>~210к</b> незакрытого долга по ЗП.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ КРЕДИТЫ ============ -->
+<div class="view" id="v-kred">
+  <div class="kpis">
+    <div class="card" style="border-color:rgba(251,113,133,.4)"><div class="lbl"><span class="dot" style="background:var(--red);box-shadow:0 0 10px var(--red)"></span>В этом месяце · июнь</div><div class="val dn" id="kpiThis">…</div><div class="sub">все платежи по кредитам</div></div>
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--gold);box-shadow:0 0 10px var(--gold)"></span>В следующем · июль</div><div class="val gd" id="kpiNext">…</div><div class="sub">надо найти к 10–11 июля</div></div>
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--red);box-shadow:0 0 10px var(--red)"></span>Тело долга</div><div class="val dn" id="kpiBody">…</div><div class="sub">остатки по всем кредитам</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>До конца 2027 отдать</div><div class="val" id="kpi2027">…</div><div class="sub">сумма платежей июнь'26–дек'27</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Платёжный календарь <span class="hint">сколько отдавать каждый месяц · наведи — точная сумма</span></h3>
+    <div class="cal" id="calStrip"></div>
+    <div class="note">Нагрузка <b>~1,1 млн/мес</b> держится до весны 2027, потом резко падает: в марте 2027 закрывается оборотный кредит (−475 580), раньше — лизинги и кредит ~1 млн. <b>Главный риск:</b> при просадке выручки этот ежемесячный платёж нечем закрыть — поэтому подушка и контроль продаж критичны.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Платежи по кредитам · кредит × месяц <span class="hint">красная клетка = платёж в этом месяце · нажми на клетку — месяц и сумма</span></h3>
+    <div class="mx" id="loanMatrix"></div>
+    <div class="mxread" id="mxRead">Нажми на красную клетку — покажу месяц и сумму платежа.</div>
+    <div class="note">Горизонт до конца 2027. По возобновляемым линиям (кредитки, овердрафт) — ежемесячный минимальный платёж/комиссия. Источники: график Поток №3676988, скрин оборотного кредита Т-Банк, договоры ИП, выписки.</div>
+  </div>
+</div>
+
 <div class="foot">
 <b>Методология:</b> точка отсчёта — 01.06.2026, дальше текучка ведётся отдельно. Кэш-метод; переводы между своими счетами исключены; тело полученных кредитов доходом не считается. Остатки ООО на 01.06 сверены ПланФакт = УУ до рубля. По ИП/личному ПланФакт ненадёжен (дыры в истории), опираемся на выписки. <b>Уточнено Эльвирой (18.06):</b> остаток ИП 1376 на 01.06 = 0 + налички нет (выписка) · выручка с личных карт Озон/Т-дебет = доход ИП · оборотный кредит ООО = 3,27 млн (475 580/мес до 03.2027). <b>Источники:</b> ПланФакт (6 279 операций, 21 счёт), выписки банков, файлы дебиторки/кредиторки, график Поток №3676988, Google-таблица УУ.
 </div>
@@ -378,13 +492,70 @@ Chart.defaults.borderColor = C.line;
 
 // segmented tabs
 const tabs = document.querySelectorAll('.tab');
-const views = {all:'v-all', ooo:'v-ooo', ip:'v-ip', fl:'v-fl'};
+const views = {all:'v-all', ooo:'v-ooo', ip:'v-ip', fl:'v-fl', zp:'v-zp', kred:'v-kred'};
 tabs.forEach(t=>t.addEventListener('click',()=>{
   tabs.forEach(x=>x.classList.remove('on'));
   t.classList.add('on');
   Object.values(views).forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById(views[t.dataset.c]).classList.add('on');
 }));
+
+// ===== платёжный навигатор: горизонт июнь 2026 → декабрь 2027 (19 мес) =====
+const fmt=n=>Math.round(n).toLocaleString('ru');
+const MON=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const HZ=19, SM=5, SY=2026; // июнь 2026 = индекс 0
+// pay — платёж/мес; n — сколько платежей ещё предстоит (в горизонте)
+const loans=[
+  {nm:'Оборотный кредит', bank:'Т-Банк №7110078770 · ООО', pay:475580, n:9,  end:'до 11.03.27'},
+  {nm:'Заём «Поток»', bank:'Поток.Диджитал №3676988 · ООО', pay:98567, n:19, end:'до 03.02.28'},
+  {nm:'Лизинг КамАЗ', bank:'Каркаде · ООО', pay:161019, n:10, end:'остаток ~1,56 млн'},
+  {nm:'Лизинг легковая', bank:'Каркаде · ООО', pay:133166, n:1, end:'остаток ~133 тыс'},
+  {nm:'Кредит ~1 млн', bank:'из диагностики · уточнить', pay:100000, n:10, end:'остаток ~1 млн'},
+  {nm:'Ипотека', bank:'Сбер · личное', pay:20053, n:19, end:'до 2055'},
+  {nm:'Кредитка основная', bank:'Эльвира (ФЛ) · Т-Банк', pay:23000, n:19, end:'мин. платёж'},
+  {nm:'Кредитка Платинум *5103', bank:'Эльвира (ФЛ) · Т-Банк', pay:27700, n:19, end:'мин. платёж'},
+  {nm:'Овердрафт ИП', bank:'Т-Банк №7080605313', pay:95000, n:19, end:'комиссии 70–120к'}
+];
+// помесячные суммы
+const months=[];
+for(let i=0;i<HZ;i++){ months.push({m:(SM+i)%12, y:SY+Math.floor((SM+i)/12), total:0}); }
+loans.forEach(l=>{ for(let i=0;i<l.n && i<HZ;i++) months[i].total+=l.pay; });
+const maxT=Math.max(...months.map(x=>x.total)), totalAll=months.reduce((s,x)=>s+x.total,0);
+const body=3150000+1274000+1560000+133166+1000000+3340000+1095000+877988+346020; // остатки по всем кредитам
+const setK=(id,v)=>{const e=document.getElementById(id); if(e)e.textContent=v;};
+setK('kpiThis', fmt(months[0].total)+' ₽');
+setK('kpiNext', fmt(months[1].total)+' ₽');
+setK('kpiBody', (body/1e6).toFixed(1).replace('.',',')+' млн');
+setK('kpi2027', (totalAll/1e6).toFixed(1).replace('.',',')+' млн');
+// календарь по месяцам
+const cal=document.getElementById('calStrip');
+if(cal) months.forEach((mo,i)=>{
+  const op=(0.06+0.32*(mo.total/maxT)).toFixed(3);
+  cal.insertAdjacentHTML('beforeend',
+    `<div class="mo${i===0?' now':''}" style="background:rgba(251,113,133,${op})" title="${MON[mo.m]} ${mo.y} — ${fmt(mo.total)} ₽">`+
+    `<div class="mlb">${MON[mo.m]} ${String(mo.y).slice(2)}</div>`+
+    `<div class="mv">${Math.round(mo.total/1000)}<small>тыс ₽</small></div></div>`);
+});
+// матрица: кредит × месяц. Подписи месяцев сверху (даты всегда видны), клик по клетке = месяц+сумма
+const mx=document.getElementById('loanMatrix');
+if(mx){
+  let h='<div class="mxg"><div class="mxn" style="font-size:9px;color:var(--dim);font-weight:700">кредит ↓ / месяц →</div>';
+  for(let i=0;i<HZ;i++){ const m=(SM+i)%12, y=SY+Math.floor((SM+i)/12);
+    h+=`<div class="mxh${i===0?' now':''}">${MON[m]}<br>${String(y).slice(2)}</div>`; }
+  loans.forEach(l=>{
+    h+=`<div class="mxn">${l.nm}<small>${fmt(l.pay)} ₽</small></div>`;
+    for(let i=0;i<HZ;i++){ const due=i<l.n, m=(SM+i)%12, y=SY+Math.floor((SM+i)/12);
+      h+=`<div class="mxc${due?' pay':''}"${due?` data-d="${MON[m]} ${y} · ${l.nm} · ${fmt(l.pay)} ₽"`:''}></div>`; }
+  });
+  h+='</div>';
+  mx.innerHTML=h;
+  const read=document.getElementById('mxRead');
+  mx.querySelectorAll('.mxc.pay').forEach(c=>c.addEventListener('click',()=>{
+    mx.querySelectorAll('.mxc.sel').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+    if(read) read.innerHTML='📅 <b>'+c.getAttribute('data-d')+'</b>';
+  }));
+}
 
 // summary chart: per contour деньги / Дт / Кт / долг (млн)
 new Chart(document.getElementById('sumChart'), {
@@ -394,7 +565,7 @@ new Chart(document.getElementById('sumChart'), {
       {label:'Касса', data:[0.335,0,0.006], backgroundColor:'rgba(94,234,212,.8)', borderRadius:6, barPercentage:.7},
       {label:'Дебиторка', data:[4.308,2.424,0], backgroundColor:'rgba(52,211,153,.5)', borderRadius:6, barPercentage:.7},
       {label:'Кредиторка', data:[3.534,2.943,0], backgroundColor:'rgba(251,113,133,.6)', borderRadius:6, barPercentage:.7},
-      {label:'Долг банкам', data:[1.4,1.145,4.564], backgroundColor:'rgba(129,140,248,.55)', borderRadius:6, barPercentage:.7}
+      {label:'Долг банкам', data:[4.42,1.145,4.564], backgroundColor:'rgba(129,140,248,.55)', borderRadius:6, barPercentage:.7}
     ]},
   options:{maintainAspectRatio:false,
     plugins:{legend:{labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
