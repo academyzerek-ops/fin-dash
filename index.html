@@ -116,6 +116,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
 .calrow{display:grid;grid-template-columns:repeat(12,minmax(42px,1fr));gap:7px}
 .mo{border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center;background:rgba(251,113,133,.06)}
 .mo.now{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.mo.spike{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset}
 .mo .mlb{font-size:10px;color:var(--mut);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 .mo .mv{font-family:'JetBrains Mono';font-size:13.5px;font-weight:600;margin-top:6px;color:#ffd7dd}
 .mo .mv small{display:block;font-size:9px;color:var(--dim);font-weight:600;margin-top:2px}
@@ -472,7 +473,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
   <div class="panel">
     <h3>Платёжный календарь <span class="hint">сколько отдавать каждый месяц · наведи — точная сумма</span></h3>
     <div class="cal" id="calStrip"></div>
-    <div class="note">Нагрузка <b>~1,1 млн/мес</b> держится до весны 2027, потом резко падает: в марте 2027 закрывается оборотный кредит (−475 580), раньше — лизинги и кредит ~1 млн. <b>Главный риск:</b> при просадке выручки этот ежемесячный платёж нечем закрыть — поэтому подушка и контроль продаж критичны.</div>
+    <div class="note">Нагрузка <b>~1,15 млн/мес</b> держится до весны 2027, потом резко падает (в марте 2027 закрывается оборотный кредит −475 580). <b>⚠ Два тяжёлых месяца:</b> ноябрь'26 (+400к) и февраль'27 (+702к) — погашение тел кредитных линий ИП (гасятся из оплаты госконтрактов; если контракт задержит оплату — кассовый разрыв). <b>Главный риск:</b> при просадке выручки ежемесячный платёж нечем закрыть — подушка и контроль продаж критичны.</div>
   </div>
 
   <div class="panel">
@@ -515,15 +516,19 @@ const loans=[
   {nm:'Лизинг КамАЗ', bank:'Каркаде · ООО', pay:161019, n:10, end:'остаток ~1,56 млн'},
   {nm:'Лизинг легковая', bank:'Каркаде · ООО', pay:133166, n:1, end:'остаток ~133 тыс'},
   {nm:'Кредит ~1 млн', bank:'из диагностики · уточнить', pay:100000, n:10, end:'остаток ~1 млн'},
+  {nm:'Кредитные линии ИП (5 шт.)', bank:'Т-Банк · под госконтракты', pay:33000, n:9, end:'комиссия 2,99%/мес · тело 1,1 млн'},
   {nm:'Ипотека', bank:'Сбер · личное', pay:20053, n:19, end:'до 2055'},
   {nm:'Кредитка основная', bank:'Эльвира (ФЛ) · Т-Банк', pay:23000, n:19, end:'мин. платёж'},
-  {nm:'Кредитка Платинум *5103', bank:'Эльвира (ФЛ) · Т-Банк', pay:27700, n:19, end:'мин. платёж'},
+  {nm:'Кредитка Платинум *5103', bank:'Эльвира (ФЛ) · Т-Банк', pay:15012, n:19, end:'проценты/мес'},
   {nm:'Овердрафт ИП', bank:'Т-Банк №7080605313', pay:95000, n:19, end:'комиссии 70–120к'}
 ];
+// разовые погашения тела кредитных линий ИП по срокам траншей (гасятся из оплаты госконтрактов)
+const lumps={5:{amt:400000,lbl:'погашение тел линий ИП: 150к+250к'}, 8:{amt:702034,lbl:'погашение тел линий ИП: 256 955+275 079+170 000'}};
 // помесячные суммы
 const months=[];
-for(let i=0;i<HZ;i++){ months.push({m:(SM+i)%12, y:SY+Math.floor((SM+i)/12), total:0}); }
+for(let i=0;i<HZ;i++){ months.push({m:(SM+i)%12, y:SY+Math.floor((SM+i)/12), total:0, lump:null}); }
 loans.forEach(l=>{ for(let i=0;i<l.n && i<HZ;i++) months[i].total+=l.pay; });
+Object.keys(lumps).forEach(k=>{ const i=+k; if(i<HZ){ months[i].total+=lumps[i].amt; months[i].lump=lumps[i]; } });
 const maxT=Math.max(...months.map(x=>x.total)), totalAll=months.reduce((s,x)=>s+x.total,0);
 const body=3150000+1274000+1560000+133166+1000000+3340000+1095000+877988+346020; // остатки по всем кредитам
 const setK=(id,v)=>{const e=document.getElementById(id); if(e)e.textContent=v;};
@@ -541,8 +546,9 @@ if(cal){
     html+=`<div class="calyr"><div class="yl">${y}</div><div class="calrow">`;
     byYear[y].forEach(mo=>{
       const op=(0.06+0.32*(mo.total/maxT)).toFixed(3);
-      html+=`<div class="mo${mo.i===0?' now':''}" style="background:rgba(251,113,133,${op})" title="${MON[mo.m]} ${mo.y} — ${fmt(mo.total)} ₽">`+
-        `<div class="mlb">${MON[mo.m]}</div><div class="mv">${Math.round(mo.total/1000)}<small>тыс ₽</small></div></div>`;
+      const tt=`${MON[mo.m]} ${mo.y} — ${fmt(mo.total)} ₽`+(mo.lump?` (вкл. ${mo.lump.lbl})`:'');
+      html+=`<div class="mo${mo.i===0?' now':''}${mo.lump?' spike':''}" style="background:rgba(251,113,133,${op})" title="${tt}">`+
+        `<div class="mlb">${MON[mo.m]}${mo.lump?' ⚠':''}</div><div class="mv">${Math.round(mo.total/1000)}<small>тыс ₽</small></div></div>`;
     });
     html+='</div></div>';
   });
