@@ -205,7 +205,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
   </div>
 
   <div class="panel" style="margin-bottom:14px">
-    <h3>Валовая маржа по месяцам 2026 <span class="hint">маржа = выручка − перевозчики · красная линия = безубыточность (~1,7 млн) · июнь по 18-е</span></h3>
+    <h3>Перевозки по месяцам 2026 <span class="hint">выручка (оценка) · рейсы · маржа vs безубыточность · фин. результат ниже нуля · июнь по 18-е</span></h3>
     <div class="chartbox" style="height:260px"><canvas id="dynChart"></canvas></div>
   </div>
 
@@ -636,17 +636,23 @@ new Chart(document.getElementById('sumChart'), {
     scales:{y:{grid:{color:C.line}, ticks:{callback:v=>v+' млн'}}, x:{grid:{display:false}}}}
 });
 
-// валовая маржа по месяцам (тыс ₽, из ABC = выручка − перевозчики; июнь по 18-е) + линия безубыточности
+// перевозки по месяцам (тыс ₽): выручка(оценка) + маржа(ABC) + ТБ + фин.результат; рейсы на правой оси
 new Chart(document.getElementById('dynChart'), {
   data:{labels:['Янв','Фев','Мар','Апр','Май','Июн*'],
     datasets:[
-      {type:'bar', label:'Валовая маржа', data:[259,364,729,583,1477,757], backgroundColor:'rgba(94,234,212,.82)', borderRadius:6, barPercentage:.55},
-      {type:'line', label:'Точка безубыточности (~1,7 млн)', data:[1710,1710,1710,1710,1710,1710], borderColor:C.red, borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false}
+      {type:'line', label:'Выручка (оценка)', data:[1295,1820,3645,2915,7385,3785], borderColor:C.teal, backgroundColor:'rgba(94,234,212,.07)', borderWidth:2, tension:.3, pointRadius:3, fill:true, yAxisID:'y', order:1},
+      {type:'bar', label:'Маржа', data:[259,364,729,583,1477,757], backgroundColor:'rgba(52,211,153,.85)', borderRadius:5, barPercentage:.75, yAxisID:'y', order:3},
+      {type:'bar', label:'Фин. результат (маржа − постоянка ~1,7 млн)', data:[-1451,-1346,-981,-1127,-233,-953], backgroundColor:'rgba(251,113,133,.8)', borderRadius:5, barPercentage:.75, yAxisID:'y', order:3},
+      {type:'line', label:'Безубыточность (1,7 млн)', data:[1710,1710,1710,1710,1710,1710], borderColor:C.red, borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false, yAxisID:'y', order:2},
+      {type:'line', label:'Рейсов', data:[42,49,66,48,105,54], borderColor:C.gold, borderWidth:2, tension:.3, pointRadius:3, yAxisID:'y1', order:0}
     ]},
   options:{maintainAspectRatio:false,
     plugins:{legend:{labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw/1000).toLocaleString('ru')+' млн ₽'}}},
-    scales:{y:{grid:{color:C.line}, ticks:{callback:v=>v/1000+' млн'}}, x:{grid:{display:false}}}}
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.dataset.yAxisID==='y1'? c.raw+' рейсов' : (c.raw/1000).toLocaleString('ru')+' млн ₽')}}},
+    scales:{
+      y:{grid:{color:C.line}, ticks:{callback:v=>v/1000+' млн'}},
+      y1:{position:'right', grid:{display:false}, ticks:{callback:v=>v+''}, title:{display:true,text:'рейсов'}},
+      x:{grid:{display:false}}}}
 });
 </script>
 </body>
