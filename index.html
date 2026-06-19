@@ -109,8 +109,12 @@ tr:hover td{background:rgba(94,234,212,.03)}
 .prog{height:7px;border-radius:99px;background:rgba(251,113,133,.25);margin-top:13px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--grn);border-radius:99px}
 /* платёжный календарь по месяцам */
-.cal{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
-.mo{flex:1 1 86px;border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center;background:rgba(251,113,133,.06)}
+.cal{margin-top:18px;overflow-x:auto}
+.calyr{margin-top:14px}
+.calyr:first-child{margin-top:0}
+.yl{font-size:11px;font-weight:800;color:var(--mut);letter-spacing:1.5px;margin-bottom:8px}
+.calrow{display:grid;grid-template-columns:repeat(12,minmax(42px,1fr));gap:7px}
+.mo{border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center;background:rgba(251,113,133,.06)}
 .mo.now{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
 .mo .mlb{font-size:10px;color:var(--mut);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 .mo .mv{font-family:'JetBrains Mono';font-size:13.5px;font-weight:600;margin-top:6px;color:#ffd7dd}
@@ -527,15 +531,23 @@ setK('kpiThis', fmt(months[0].total)+' ₽');
 setK('kpiNext', fmt(months[1].total)+' ₽');
 setK('kpiBody', (body/1e6).toFixed(1).replace('.',',')+' млн');
 setK('kpi2027', (totalAll/1e6).toFixed(1).replace('.',',')+' млн');
-// календарь по месяцам
+// календарь по месяцам — отдельная строка на каждый год (2026 сверху, 2027 снизу)
 const cal=document.getElementById('calStrip');
-if(cal) months.forEach((mo,i)=>{
-  const op=(0.06+0.32*(mo.total/maxT)).toFixed(3);
-  cal.insertAdjacentHTML('beforeend',
-    `<div class="mo${i===0?' now':''}" style="background:rgba(251,113,133,${op})" title="${MON[mo.m]} ${mo.y} — ${fmt(mo.total)} ₽">`+
-    `<div class="mlb">${MON[mo.m]} ${String(mo.y).slice(2)}</div>`+
-    `<div class="mv">${Math.round(mo.total/1000)}<small>тыс ₽</small></div></div>`);
-});
+if(cal){
+  const byYear={};
+  months.forEach((mo,i)=>{ (byYear[mo.y]=byYear[mo.y]||[]).push(Object.assign({i},mo)); });
+  let html='';
+  Object.keys(byYear).sort().forEach(y=>{
+    html+=`<div class="calyr"><div class="yl">${y}</div><div class="calrow">`;
+    byYear[y].forEach(mo=>{
+      const op=(0.06+0.32*(mo.total/maxT)).toFixed(3);
+      html+=`<div class="mo${mo.i===0?' now':''}" style="background:rgba(251,113,133,${op})" title="${MON[mo.m]} ${mo.y} — ${fmt(mo.total)} ₽">`+
+        `<div class="mlb">${MON[mo.m]}</div><div class="mv">${Math.round(mo.total/1000)}<small>тыс ₽</small></div></div>`;
+    });
+    html+='</div></div>';
+  });
+  cal.innerHTML=html;
+}
 // матрица: кредит × месяц. Подписи месяцев сверху (даты всегда видны), клик по клетке = месяц+сумма
 const mx=document.getElementById('loanMatrix');
 if(mx){
