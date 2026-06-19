@@ -38,8 +38,10 @@ header{display:flex;justify-content:space-between;align-items:flex-end;padding-b
 .tab[data-c="fl"].on{background:var(--fl);border-color:var(--fl)}
 .tab[data-c="zp"].on{background:var(--gold);border-color:var(--gold)}
 .tab[data-c="kred"].on{background:var(--red);border-color:var(--red)}
+.tab[data-c="gos"].on{background:var(--grn);border-color:var(--grn)}
 .tab[data-c="zp"] .d{background:var(--gold)}
 .tab[data-c="kred"] .d{background:var(--red)}
+.tab[data-c="gos"] .d{background:var(--grn)}
 .tab .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
 .tab[data-c="all"] .d{background:#fff}
 .tab[data-c="ooo"] .d{background:var(--ooo)}
@@ -164,6 +166,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
   <div class="tab" data-c="ooo"><span class="d"></span>ООО</div>
   <div class="tab" data-c="ip"><span class="d"></span>ИП</div>
   <div class="tab" data-c="fl"><span class="d"></span>Личное</div>
+  <div class="tab" data-c="gos"><span class="d"></span>Госконтракты</div>
   <div class="tab" data-c="zp"><span class="d"></span>Долги ЗП</div>
   <div class="tab" data-c="kred"><span class="d"></span>Кредиты</div>
 </div>
@@ -175,7 +178,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
       <h3><span><span class="pill ooo">ООО</span> «ТЭС Энсай»</span></h3>
       <div class="ent">
         <div class="acct"><span>Касса сейчас</span><span class="num up">335 335</span></div>
-        <div class="acct"><span>Дебиторка (нам должны)</span><span class="num">4 307 660</span></div>
+        <div class="acct"><span>К получению, брутто (см. Госконтракты)</span><span class="num">4 307 660</span></div>
         <div class="acct"><span>Кредиторка (перевозчикам, 48)</span><span class="num dn">3 534 500</span></div>
         <div class="acct"><span>Долг по ЗП сотрудникам</span><span class="num dn">~210 000</span></div>
         <div class="acct"><span>Банк-долг (оборотн. 3,15 + Поток 1,27)</span><span class="num dn">~4,42 млн</span></div>
@@ -185,7 +188,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
       <h3><span><span class="pill ip">ИП</span> Павлова Э.О.</span></h3>
       <div class="ent">
         <div class="acct"><span>Касса на 01.06 (через овердрафт)</span><span class="num">≈ 0</span></div>
-        <div class="acct"><span>Дебиторка (нам должны)</span><span class="num">2 423 762</span></div>
+        <div class="acct"><span>К получению, брутто (см. Госконтракты)</span><span class="num">2 423 762</span></div>
         <div class="acct"><span>Кредиторка (перевозчикам, 49)</span><span class="num dn">2 942 672</span></div>
         <div class="acct"><span>Кред. линии + овердрафт</span><span class="num dn">1 144 641</span></div>
       </div>
@@ -243,13 +246,13 @@ tr:hover td{background:rgba(94,234,212,.03)}
       <div class="chartbox" style="height:300px"><canvas id="sumChart"></canvas></div>
     </div>
     <div class="panel">
-      <h3>Чистая позиция по операционке</h3>
+      <h3>Расклад по операционке</h3>
       <div class="ent">
-        <div class="acct"><span>Дебиторка ООО+ИП</span><span class="num up">6 731 422</span></div>
-        <div class="acct"><span>Кредиторка ООО+ИП</span><span class="num dn">6 477 172</span></div>
-        <div class="acct" style="border-color:rgba(94,234,212,.3)"><span><b>Сальдо операционки</b></span><span class="num up"><b>+254 250</b></span></div>
+        <div class="acct"><span>Касса сейчас (ООО+ИП)</span><span class="num up">~335 тыс</span></div>
+        <div class="acct"><span>Должны перевозчикам</span><span class="num dn">6 477 172</span></div>
+        <div class="acct"><span>Платежи по кредитам</span><span class="num dn">~1,15 млн/мес</span></div>
       </div>
-      <div class="note"><b>Вывод:</b> бизнес платёжеспособен по сути — клиенты должны больше (6,73 млн), чем мы перевозчикам (6,48 млн). Проблема не дыра, а <b>кассовый разрыв по времени</b>: клиенты платят с отсрочкой (факторинг, «до 19–26.06», суд), а перевозчикам и ЗП платить надо сейчас. На 01.06 в кассе было всего ~61 тыс ₽.</div>
+      <div class="note"><b>Важно про «дебиторку»:</b> то, что должны клиенты, <b>нельзя считать живыми деньгами целиком</b> — часть уже у фактора (НК НПЗ 1,28 млн), часть за незакрытые рейсы, по КРП спорно. Реальные поступления — на странице <b>«Госконтракты»</b>. Касса мизерная против долга перевозчикам 6,48 млн и ~1,15 млн/мес по кредитам → главный риск — <b>кассовый разрыв</b>: чем платить сейчас, пока клиенты платят с отсрочкой.</div>
     </div>
   </div>
 </div>
@@ -258,7 +261,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
 <div class="view" id="v-ooo">
   <div class="kpis">
     <div class="card"><div class="lbl"><span class="dot"></span>Касса сейчас</div><div class="val up">335 335</div><div class="sub">3 счёта · на 01.06 было 54 560</div></div>
-    <div class="card"><div class="lbl"><span class="dot"></span>Дебиторка</div><div class="val">4,31 млн</div><div class="sub">21 клиент · нам должны</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>К получению, брутто</div><div class="val">4,31 млн</div><div class="sub">с оговорками · см. Госконтракты</div></div>
     <div class="card"><div class="lbl"><span class="dot"></span>Кредиторка</div><div class="val dn">3,53 млн</div><div class="sub">48 перевозчиков</div></div>
     <div class="card"><div class="lbl"><span class="dot"></span>Банк-долг</div><div class="val dn">~4,4 млн</div><div class="sub">оборотн. 3,15 + Поток 1,27</div></div>
   </div>
@@ -289,7 +292,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
 
   <div class="grid">
     <div class="panel">
-      <h3>Дебиторка — нам должны клиенты <span class="hint">на 16.06 · топ из 21 · ₽</span></h3>
+      <h3>Ожидаемые поступления по заказам <span class="hint">брутто · на 16.06 · топ из 21 · ₽</span></h3>
       <table>
         <tr><th>Клиент</th><th style="text-align:right">₽</th><th style="text-align:right">срок</th></tr>
         <tr><td>АО «НК НПЗ»</td><td class="num">1 279 298</td><td class="num muted">факторинг</td></tr>
@@ -300,7 +303,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
         <tr><td>КЛЗ</td><td class="num">135 000</td><td class="num muted">до 26.06</td></tr>
         <tr><td>… ещё 15 клиентов</td><td class="num muted">…</td><td></td></tr>
       </table>
-      <div class="total pos"><span>ИТОГО Дт ООО</span><b style="color:var(--acc)">4 307 660</b></div>
+      <div class="total pos"><span>ИТОГО, брутто (ООО)</span><b style="color:var(--acc)">4 307 660</b></div>
     </div>
     <div class="panel">
       <h3>Обязательства ООО <span class="hint">долги банкам / бюджету</span></h3>
@@ -330,7 +333,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
 <div class="view" id="v-ip">
   <div class="kpis">
     <div class="card ip"><div class="lbl"><span class="dot"></span>Касса на 01.06</div><div class="val">≈ 0</div><div class="sub">1376 на 01.06 = 0 (выписка), идёт через овердрафт</div></div>
-    <div class="card ip"><div class="lbl"><span class="dot"></span>Дебиторка</div><div class="val">2,42 млн</div><div class="sub">20 клиентов · в осн. гос/ФСИН</div></div>
+    <div class="card ip"><div class="lbl"><span class="dot"></span>К получению, брутто</div><div class="val">2,42 млн</div><div class="sub">в осн. гос/ФСИН · см. Госконтракты</div></div>
     <div class="card ip"><div class="lbl"><span class="dot"></span>Кредиторка</div><div class="val dn">2,94 млн</div><div class="sub">49 перевозчиков</div></div>
     <div class="card ip"><div class="lbl"><span class="dot"></span>Кред. линии + овердрафт</div><div class="val dn">1,14 млн</div><div class="sub">5 линий под госконтракты</div></div>
   </div>
@@ -345,7 +348,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
       <div class="note">*Подтверждено выпиской: остаток 1376 на 01.06 = <b>0</b> (вход. и исх. 0.00). Техминус в июне — это работа через овердрафт, а не пропущенный остаток. Наличной кассы нет.</div>
     </div>
     <div class="panel">
-      <h3>Дебиторка — нам должны клиенты <span class="hint">на 16.06 · топ из 20 · ₽</span></h3>
+      <h3>Ожидаемые поступления по заказам <span class="hint">брутто · на 16.06 · топ из 20 · ₽</span></h3>
       <table>
         <tr><th>Клиент</th><th style="text-align:right">₽</th><th style="text-align:right">срок</th></tr>
         <tr><td>ФКУ ИК-1 (Тамбов)</td><td class="num">544 000</td><td class="num muted">тс едет</td></tr>
@@ -355,7 +358,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
         <tr><td>ФКУ ИК-5 (МО)</td><td class="num">154 500</td><td class="num muted">до 19.06</td></tr>
         <tr><td>… ещё 15 клиентов</td><td class="num muted">…</td><td></td></tr>
       </table>
-      <div class="total pos"><span>ИТОГО Дт ИП</span><b style="color:var(--acc)">2 423 762</b></div>
+      <div class="total pos"><span>ИТОГО, брутто (ИП)</span><b style="color:var(--acc)">2 423 762</b></div>
     </div>
   </div>
 
@@ -484,6 +487,25 @@ tr:hover td{background:rgba(94,234,212,.03)}
   </div>
 </div>
 
+<!-- ============ ГОСКОНТРАКТЫ ============ -->
+<div class="view" id="v-gos">
+  <div class="kpis">
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--grn);box-shadow:0 0 10px var(--grn)"></span>Маржа госсегмента</div><div class="val up">636 186</div><div class="sub">15,3% прибыли компании</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>Заказов</div><div class="val">55</div><div class="sub">21 организация · старт март'26</div></div>
+    <div class="card"><div class="lbl"><span class="dot" style="background:var(--grn);box-shadow:0 0 10px var(--grn)"></span>Остаток к получению</div><div class="val up" id="kpiGosOst">…</div><div class="sub">по дебиторке (с учётом факторинга)</div></div>
+    <div class="card" style="border-color:rgba(251,113,133,.35)"><div class="lbl"><span class="dot" style="background:var(--red);box-shadow:0 0 10px var(--red)"></span>⚠ НК НПЗ — факторинг</div><div class="val dn">1,28 млн</div><div class="sub">возможно уже у фактора — уточнить</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Госконтракты — экономика <span class="hint">маржа из ABC-заказов · остаток из дебиторки на 16.06 · ₽</span></h3>
+    <table>
+      <thead><tr><th>Заказчик</th><th style="text-align:right">Рейсов</th><th style="text-align:right">Маржа</th><th style="text-align:right">Остаток к получению</th><th>Статус</th></tr></thead>
+      <tbody id="gosBody"></tbody>
+    </table>
+    <div class="note"><b>Как читать:</b> «Маржа» — что компания заработала на заказе (из ABC). «Остаток» — сколько ещё должны (дебиторка). Выручка контракта ≈ остаток + уже оплачено; траты на перевозчика ≈ выручка − маржа. <b>Оговорки:</b> по <b>НК НПЗ</b> 1,28 млн — факторинг, деньги, возможно, уже получены от фактора (уточнить). По <b>КРП</b> остаток спорный (683к по ABC vs 1,1 млн в дебиторке). Где «тс едет/грузится» — рейс ещё не закрыт, это будущий доход. Точная экономика «сумма контракта / аванс / траты» будет считаться автоматически, когда операции начнут тегать проектом (лист «ПРОЕКТЫ»).</div>
+  </div>
+</div>
+
 <div class="foot">
 <b>Методология:</b> точка отсчёта — 01.06.2026, дальше текучка ведётся отдельно. Кэш-метод; переводы между своими счетами исключены; тело полученных кредитов доходом не считается. Остатки ООО на 01.06 сверены ПланФакт = УУ до рубля. По ИП/личному ПланФакт ненадёжен (дыры в истории), опираемся на выписки. <b>Уточнено Эльвирой (18.06):</b> остаток ИП 1376 на 01.06 = 0 + налички нет (выписка) · выручка с личных карт Озон/Т-дебет = доход ИП · оборотный кредит ООО = 3,27 млн (475 580/мес до 03.2027). <b>Источники:</b> ПланФакт (6 279 операций, 21 счёт), выписки банков, файлы дебиторки/кредиторки, график Поток №3676988, Google-таблица УУ.
 </div>
@@ -497,7 +519,7 @@ Chart.defaults.borderColor = C.line;
 
 // segmented tabs
 const tabs = document.querySelectorAll('.tab');
-const views = {all:'v-all', ooo:'v-ooo', ip:'v-ip', fl:'v-fl', zp:'v-zp', kred:'v-kred'};
+const views = {all:'v-all', ooo:'v-ooo', ip:'v-ip', fl:'v-fl', gos:'v-gos', zp:'v-zp', kred:'v-kred'};
 tabs.forEach(t=>t.addEventListener('click',()=>{
   tabs.forEach(x=>x.classList.remove('on'));
   t.classList.add('on');
@@ -575,13 +597,47 @@ if(mx){
   }));
 }
 
+// госконтракты — экономика (маржа из ABC + остаток из дебиторки)
+const GOS=[
+ ['ФКУ ИК-1 Тамбов',3,182474,544000,'тс едет'],
+ ['ФГБУ ВНИГНИ',1,92500,480000,'до 19.06'],
+ ['ФКУТ Саратов',8,71918,60153,'до 19.06'],
+ ['ФКУ ИК-2 Тульская',6,70902,43405,'до 19.06'],
+ ['АО «НК НПЗ»',2,46760,1279298,'факторинг ⚠'],
+ ['ФКУ ИК-5 Московская',2,39700,154500,'до 19.06'],
+ ['ФКУ Т-2 Липецкая',4,37741,24741,'до 26.06'],
+ ['ФКУ ИК-17 Красноярск',1,20946,102946,'до 19.06'],
+ ['ФКУ ИК-6 Оренбург',5,20000,0,'оплачено'],
+ ['ФКУЗ МСЧ-38',1,19000,72000,'тс едет'],
+ ['ФКУЗ МСЧ-78',3,18400,19800,'тс едет'],
+ ['ФКУ МСЭ Марий Эл',1,18000,30000,'до 16.06'],
+ ['ФКУЗ МСЧ-50',1,10600,25600,'ориг'],
+ ['УФСИН Марий Эл',1,6836,0,'оплачено'],
+ ['ФКУ ИК-4 Липецкая',4,5416,23017,'до 19.06'],
+ ['ФКУ ИК-4 Ивановская',2,3500,43500,'тс едет'],
+ ['ФКУ ИК-5 Ивановская',1,3000,30000,'до 26.06'],
+ ['ФКУ ИК-6 Липецкая',1,2000,23000,'до 26.06'],
+ ['ОАО «РЖД»',1,780,17422,'ориг'],
+ ['РМАНПО Минздрав',2,-24500,115500,'ориг · убыток'],
+ ['ФГБНУ ВНИРО',5,-9787,68000,'тс загрузится · убыток']
+];
+const gb=document.getElementById('gosBody');
+if(gb){ let ostTot=0, mTot=0;
+  GOS.forEach(r=>{ ostTot+=r[3]; mTot+=r[2];
+    gb.insertAdjacentHTML('beforeend',`<tr><td>${r[0]}</td><td class="num">${r[1]}</td>`+
+      `<td class="num ${r[2]<0?'dn':'up'}">${fmt(r[2])}</td>`+
+      `<td class="num">${r[3]?fmt(r[3]):'—'}</td>`+
+      `<td style="font-size:11px;color:${/факторинг|убыток/.test(r[4])?'var(--red)':'var(--mut)'}">${r[4]}</td></tr>`); });
+  gb.insertAdjacentHTML('beforeend',`<tr style="border-top:2px solid var(--line)"><td><b>ИТОГО</b></td><td class="num"><b>55</b></td><td class="num up"><b>${fmt(mTot)}</b></td><td class="num"><b>${fmt(ostTot)}</b></td><td></td></tr>`);
+  const k=document.getElementById('kpiGosOst'); if(k) k.textContent=fmt(ostTot)+' ₽';
+}
+
 // summary chart: per contour деньги / Дт / Кт / долг (млн)
 new Chart(document.getElementById('sumChart'), {
   type:'bar',
   data:{labels:['ООО','ИП','Личное'],
     datasets:[
       {label:'Касса', data:[0.335,0,0.006], backgroundColor:'rgba(94,234,212,.8)', borderRadius:6, barPercentage:.7},
-      {label:'Дебиторка', data:[4.308,2.424,0], backgroundColor:'rgba(52,211,153,.5)', borderRadius:6, barPercentage:.7},
       {label:'Кредиторка', data:[3.534,2.943,0], backgroundColor:'rgba(251,113,133,.6)', borderRadius:6, barPercentage:.7},
       {label:'Долг банкам', data:[4.42,1.145,4.564], backgroundColor:'rgba(129,140,248,.55)', borderRadius:6, barPercentage:.7}
     ]},
