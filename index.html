@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЭС ЭНСАЙ · Управленческий дашборд</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#07090f; --bg2:#0b0e17; --card:#10141f; --card2:#141927;
+  --line:rgba(255,255,255,.06); --txt:#e8ecf4; --mut:#8b93a7; --dim:#5a6175;
+  --acc:#5eead4; --acc2:#818cf8; --gold:#fbbf24; --red:#fb7185; --grn:#34d399;
+  --ooo:#5eead4; --ip:#818cf8; --fl:#fbbf24;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(900px 500px at 80% -10%, rgba(94,234,212,.07), transparent 60%),
+  radial-gradient(700px 500px at 10% 110%, rgba(129,140,248,.08), transparent 60%);pointer-events:none}
+.wrap{max-width:1480px;margin:0 auto;padding:28px 32px 64px;position:relative}
+header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.brand h1{font-family:'Unbounded';font-size:26px;font-weight:700;letter-spacing:.5px}
+.brand h1 em{font-style:normal;color:var(--acc)}
+.brand p{color:var(--mut);font-size:13px;margin-top:6px}
+.period{text-align:right}
+.period .tag{display:inline-block;background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(129,140,248,.15));border:1px solid rgba(94,234,212,.3);color:var(--acc);font-size:12px;font-weight:700;letter-spacing:1.5px;padding:7px 16px;border-radius:99px}
+.period p{color:var(--dim);font-size:11px;margin-top:8px}
+
+/* segmented tabs */
+.tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.tab{cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--mut);
+  font-size:13px;font-weight:700;letter-spacing:.6px;padding:10px 20px;border-radius:12px;transition:all .2s;user-select:none}
+.tab:hover{color:var(--txt);border-color:rgba(255,255,255,.18)}
+.tab.on{color:var(--bg);background:var(--acc);border-color:var(--acc)}
+.tab[data-c="ip"].on{background:var(--ip);border-color:var(--ip)}
+.tab[data-c="fl"].on{background:var(--fl);border-color:var(--fl)}
+.tab .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.tab[data-c="all"] .d{background:#fff}
+.tab[data-c="ooo"] .d{background:var(--ooo)}
+.tab[data-c="ip"] .d{background:var(--ip)}
+.tab[data-c="fl"] .d{background:var(--fl)}
+
+.view{display:none}
+.view.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.kpis.six{grid-template-columns:repeat(3,1fr)}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(94,234,212,.25)}
+.card .lbl{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--mut);text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.card .lbl .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.card.ip .lbl .dot{background:var(--ip);box-shadow:0 0 10px var(--ip)}
+.card.fl .lbl .dot{background:var(--fl);box-shadow:0 0 10px var(--fl)}
+.card .val{font-family:'JetBrains Mono';font-size:25px;font-weight:600;margin-top:10px;line-height:1.1}
+.card .sub{font-size:12px;color:var(--mut);margin-top:7px}
+.up{color:var(--grn)} .dn{color:var(--red)} .gd{color:var(--gold)} .muted{color:var(--dim)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid.wide{grid-template-columns:1.4fr 1fr}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.panel{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:20px;padding:22px 24px}
+.panel h3{font-size:14px;font-weight:800;letter-spacing:.4px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel h3 .hint{font-size:11px;color:var(--dim);font-weight:500;text-align:right}
+.chartbox{position:relative;margin-top:16px}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px}
+th{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,.035)}
+td.num{font-family:'JetBrains Mono';text-align:right;font-size:12px}
+tr:hover td{background:rgba(94,234,212,.03)}
+.ent{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.acct{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:12px;font-size:13px}
+.acct .num{font-family:'JetBrains Mono';font-weight:600}
+.pill{font-size:10px;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.8px}
+.pill.ooo{background:rgba(94,234,212,.12);color:var(--ooo)}
+.pill.ip{background:rgba(129,140,248,.14);color:var(--ip)}
+.pill.fl{background:rgba(251,191,36,.12);color:var(--fl)}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.cgrid.c3{grid-template-columns:repeat(3,1fr)}
+.tile{position:relative;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;gap:14px;padding:14px;min-height:120px;transition:transform .2s,border-color .2s}
+.tile:hover{transform:translateY(-3px);border-color:rgba(52,211,153,.35)}
+.tile .nm{font-size:11.5px;font-weight:700;line-height:1.35;position:relative;z-index:1}
+.tile .nm small{display:block;color:var(--mut);font-weight:600;font-size:10px;margin-top:3px}
+.tile .od{font-family:'JetBrains Mono';font-size:19px;font-weight:600;position:relative;z-index:1}
+.tile .od small{display:block;font-family:'Manrope';font-size:10px;color:var(--mut);font-weight:600;margin-top:3px}
+@media(max-width:1200px){.cgrid,.cgrid.c3{grid-template-columns:repeat(2,1fr)}}
+.total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(251,113,133,.08),rgba(251,191,36,.08));border:1px solid rgba(251,113,133,.25)}
+.total b{font-family:'JetBrains Mono';font-size:20px;color:var(--gold)}
+.total.pos{background:rgba(94,234,212,.06);border-color:rgba(94,234,212,.22)}
+.total.pos b{color:var(--acc)}
+.note{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.22);border-radius:12px;padding:12px 15px;font-size:12px;color:var(--mut);line-height:1.6;margin-top:14px}
+.note b{color:var(--gold)}
+.foot{color:var(--dim);font-size:11px;line-height:1.7;margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
+.foot b{color:var(--mut)}
+@media(max-width:1200px){.kpis,.kpis.six{grid-template-columns:repeat(2,1fr)}.grid,.grid.wide,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <h1>ТЭС <em>ЭНСАЙ</em></h1>
+    <p>Управленческий учёт · три контура: ООО «ТЭС Энсай» · ИП Павлова Э.О. · личное</p>
+  </div>
+  <div class="period">
+    <span class="tag">ТОЧКА ОТСЧЁТА · 01.06.2026</span>
+    <p>обновлено 19.06.2026 · операции 01–18.06 в учёте · источники: ПланФакт + выписки + Google Sheets УУ</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab on" data-c="all"><span class="d"></span>Сводно</div>
+  <div class="tab" data-c="ooo"><span class="d"></span>ООО</div>
+  <div class="tab" data-c="ip"><span class="d"></span>ИП</div>
+  <div class="tab" data-c="fl"><span class="d"></span>Личное</div>
+</div>
+
+<!-- ============ СВОДНО ============ -->
+<div class="view on" id="v-all">
+  <div class="grid3">
+    <div class="panel">
+      <h3><span><span class="pill ooo">ООО</span> «ТЭС Энсай»</span></h3>
+      <div class="ent">
+        <div class="acct"><span>Касса сейчас</span><span class="num up">335 335</span></div>
+        <div class="acct"><span>Дебиторка (нам должны)</span><span class="num">4 307 660</span></div>
+        <div class="acct"><span>Кредиторка (перевозчикам, 48)</span><span class="num dn">3 534 500</span></div>
+        <div class="acct"><span>Долг по ЗП сотрудникам</span><span class="num dn">~210 000</span></div>
+        <div class="acct"><span>Банк-долг (Поток 1,4 + оборотн. 3,27)</span><span class="num dn">~4,67 млн</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><span><span class="pill ip">ИП</span> Павлова Э.О.</span></h3>
+      <div class="ent">
+        <div class="acct"><span>Касса на 01.06 (через овердрафт)</span><span class="num">≈ 0</span></div>
+        <div class="acct"><span>Дебиторка (нам должны)</span><span class="num">2 423 762</span></div>
+        <div class="acct"><span>Кредиторка (перевозчикам, 49)</span><span class="num dn">2 942 672</span></div>
+        <div class="acct"><span>Кред. линии + овердрафт</span><span class="num dn">1 144 641</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><span><span class="pill fl">ЛИЧНОЕ</span> Эльвира</span></h3>
+      <div class="ent">
+        <div class="acct"><span>Личные счета (Озон+Т-дебет)</span><span class="num">~6 264</span></div>
+        <div class="acct"><span>Ипотека Сбер (25 лет)</span><span class="num dn">3 340 000</span></div>
+        <div class="acct"><span>Кредитки (Т-Банк+Сбер)</span><span class="num dn">~1,2 млн</span></div>
+        <div class="acct"><span>Изъято из бизнеса (июнь)</span><span class="num gd">372 762</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Динамика по месяцам 2026 <span class="hint">обороты (приход / расход), кэш по ПланФакту · июнь по 18-е</span></h3>
+    <div class="chartbox" style="height:260px"><canvas id="dynChart"></canvas></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Доходы — ИЮНЬ <span class="hint">упр. учёт из таблицы · ₽</span></h3>
+      <table>
+        <tr><td>Оказание услуг (выручка)</td><td class="num">2 845 404</td></tr>
+        <tr><td>Кредиты и займы (овердрафт)</td><td class="num">654 155</td></tr>
+        <tr><td>Прочие доходы</td><td class="num">625 275</td></tr>
+        <tr><td>Возвраты</td><td class="num">27 103</td></tr>
+      </table>
+      <div class="total pos"><span>ИТОГО доходы</span><b style="color:var(--acc)">4 151 938</b></div>
+    </div>
+    <div class="panel">
+      <h3>Расходы — ИЮНЬ <span class="hint">упр. учёт из таблицы · ₽</span></h3>
+      <table>
+        <tr><td>Перевозчики</td><td class="num">1 527 000</td></tr>
+        <tr><td>Прочие расходы</td><td class="num">634 665</td></tr>
+        <tr><td>Кредиты (погашение овердрафта)</td><td class="num">567 552</td></tr>
+        <tr><td>Дивиденды (изъятия владельца)</td><td class="num">566 016</td></tr>
+        <tr><td>Налоги ЕНП</td><td class="num">161 674</td></tr>
+        <tr><td>Банковские услуги</td><td class="num">157 772</td></tr>
+        <tr><td class="muted">… прочее (консалтинг, юр., ГСМ, связь…)</td><td class="num muted">301 723</td></tr>
+      </table>
+      <div class="total"><span>ИТОГО расходы</span><b>3 916 402</b></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="row big" style="border-top:none;padding-top:0;margin-top:0"><span><b>Сальдо июня (кэш, доход − расход)</b></span><span class="num up"><b>+235 536</b></span></div>
+    <div class="note">Чистый управленческий учёт из УУ-таблицы (без внутренних переводов 158к). Если убрать финансовое (овердрафт: займы 654к − погашение 568к) и изъятия владельца (дивиденды 566к), <b>операционная прибыль июня ≈ +0,7 млн</b>. По мере заноса следующих месяцев здесь появится помесячная динамика в чистых цифрах.</div>
+  </div>
+
+  <div class="grid wide">
+    <div class="panel">
+      <h3>Контуры — деньги и долги <span class="hint">млн ₽</span></h3>
+      <div class="chartbox" style="height:300px"><canvas id="sumChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Чистая позиция по операционке</h3>
+      <div class="ent">
+        <div class="acct"><span>Дебиторка ООО+ИП</span><span class="num up">6 731 422</span></div>
+        <div class="acct"><span>Кредиторка ООО+ИП</span><span class="num dn">6 477 172</span></div>
+        <div class="acct" style="border-color:rgba(94,234,212,.3)"><span><b>Сальдо операционки</b></span><span class="num up"><b>+254 250</b></span></div>
+      </div>
+      <div class="note"><b>Вывод:</b> бизнес платёжеспособен по сути — клиенты должны больше (6,73 млн), чем мы перевозчикам (6,48 млн). Проблема не дыра, а <b>кассовый разрыв по времени</b>: клиенты платят с отсрочкой (факторинг, «до 19–26.06», суд), а перевозчикам и ЗП платить надо сейчас. На 01.06 в кассе было всего ~61 тыс ₽.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ООО ============ -->
+<div class="view" id="v-ooo">
+  <div class="kpis">
+    <div class="card"><div class="lbl"><span class="dot"></span>Касса сейчас</div><div class="val up">335 335</div><div class="sub">3 счёта · на 01.06 было 54 560</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>Дебиторка</div><div class="val">4,31 млн</div><div class="sub">21 клиент · нам должны</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>Кредиторка</div><div class="val dn">3,53 млн</div><div class="sub">48 перевозчиков</div></div>
+    <div class="card"><div class="lbl"><span class="dot"></span>Банк-долг</div><div class="val dn">~1,4 млн</div><div class="sub">Поток + оборотн. кредит (?)</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Счета ООО <span class="hint">остаток сейчас · на 01.06</span></h3>
+      <div class="ent">
+        <div class="acct"><span><span class="pill ooo">ООО</span> &nbsp;Альфа-Банк 0372</span><span class="num up">284 200 <small style="color:var(--dim)">· 01.06: 53 621</small></span></div>
+        <div class="acct"><span><span class="pill ooo">ООО</span> &nbsp;Т-Банк 1048</span><span class="num">44 596 <small style="color:var(--dim)">· 386</small></span></div>
+        <div class="acct"><span><span class="pill ooo">ООО</span> &nbsp;Точка 8149</span><span class="num">6 539 <small style="color:var(--dim)">· 553</small></span></div>
+      </div>
+      <div class="note" style="background:rgba(94,234,212,.05);border-color:rgba(94,234,212,.2)"><b style="color:var(--acc)">Сверено:</b> остатки ООО на 01.06 в ПланФакте и в УУ-таблице совпали до рубля.</div>
+    </div>
+    <div class="panel">
+      <h3>Кредиторка — перевозчикам <span class="hint">топ из 46 · ₽</span></h3>
+      <table>
+        <tr><th>Перевозчик</th><th style="text-align:right">₽</th></tr>
+        <tr><td>СпецТехГрупп116</td><td class="num">220 000</td></tr>
+        <tr><td>ИП Иванов В.Р.</td><td class="num">190 000</td></tr>
+        <tr><td>БУЛААВТО</td><td class="num">180 000</td></tr>
+        <tr><td>АТВ Трейд / Большегруз 67</td><td class="num">по 170 000</td></tr>
+        <tr><td>… ещё 43 перевозчика</td><td class="num muted">…</td></tr>
+        <tr><td><b>ИТОГО кредиторка ООО (48)</b></td><td class="num dn"><b>3 534 500</b></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Дебиторка — нам должны клиенты <span class="hint">на 16.06 · топ из 21 · ₽</span></h3>
+      <table>
+        <tr><th>Клиент</th><th style="text-align:right">₽</th><th style="text-align:right">срок</th></tr>
+        <tr><td>АО «НК НПЗ»</td><td class="num">1 279 298</td><td class="num muted">факторинг</td></tr>
+        <tr><td>АО «КРП»</td><td class="num">1 098 000</td><td class="num muted">решается</td></tr>
+        <tr><td>АО «НПК ДЕДАЛ»</td><td class="num">604 000</td><td class="num muted">до 19.06</td></tr>
+        <tr><td>КЗ «Ростсельмаш»</td><td class="num">286 000</td><td class="num muted">до 26.06</td></tr>
+        <tr><td>УК «КЭР-Холдинг»</td><td class="num">135 000</td><td class="num muted">ждём ориг.</td></tr>
+        <tr><td>КЛЗ</td><td class="num">135 000</td><td class="num muted">до 26.06</td></tr>
+        <tr><td>… ещё 15 клиентов</td><td class="num muted">…</td><td></td></tr>
+      </table>
+      <div class="total pos"><span>ИТОГО Дт ООО</span><b style="color:var(--acc)">4 307 660</b></div>
+    </div>
+    <div class="panel">
+      <h3>Обязательства ООО <span class="hint">долги банкам / бюджету</span></h3>
+      <div class="cgrid c3">
+        <div class="tile"><div class="nm">Заём Поток<small>№3676988 · до 02.2028</small></div><div class="od">~1,4 млн<small>98,5 тыс/мес · был штраф 29 867</small></div></div>
+        <div class="tile"><div class="nm">Оборотный кредит<small>Т-Банк · до 11.03.2027</small></div><div class="od dn">3,27 млн<small>475 580/мес · погашено 1,05 из 4,2 млн</small></div></div>
+        <div class="tile"><div class="nm">НДС + страх. взносы<small>осталось 2 части из 3</small></div><div class="od muted">часть<small>+ страхование грузов ~60 тыс</small></div></div>
+      </div>
+      <div class="note">Аренда офиса за июнь ~35 тыс (делится с ИП) ещё не оплачена.</div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Долги по ЗП сотрудникам <span class="hint">неофиц. часть «на карту» · разнос ООО/ИП на уточнении</span></h3>
+    <table>
+      <tr><th>Сотрудник</th><th style="text-align:right">долг «на карту», ₽</th></tr>
+      <tr><td>Маша (Абраменко) — менеджер</td><td class="num dn">~70 000</td></tr>
+      <tr><td>Таня — зам (за 2 мес)</td><td class="num dn">~90 000 *</td></tr>
+      <tr><td>Лариса — HR</td><td class="num dn">~50 000</td></tr>
+      <tr><td><b>ИТОГО долг по ЗП</b></td><td class="num dn"><b>~210 000</b></td></tr>
+    </table>
+    <div class="note">* Таня — «перепроверить ещё надо». Остальные (Марина, Дима, Лена, Саша, Вася, Линда) за июнь выплачены. Официальная часть ЗП — в «Списке получателей №22 от 10.06».</div>
+  </div>
+</div>
+
+<!-- ============ ИП ============ -->
+<div class="view" id="v-ip">
+  <div class="kpis">
+    <div class="card ip"><div class="lbl"><span class="dot"></span>Касса на 01.06</div><div class="val">≈ 0</div><div class="sub">1376 на 01.06 = 0 (выписка), идёт через овердрафт</div></div>
+    <div class="card ip"><div class="lbl"><span class="dot"></span>Дебиторка</div><div class="val">2,42 млн</div><div class="sub">20 клиентов · в осн. гос/ФСИН</div></div>
+    <div class="card ip"><div class="lbl"><span class="dot"></span>Кредиторка</div><div class="val dn">2,94 млн</div><div class="sub">49 перевозчиков</div></div>
+    <div class="card ip"><div class="lbl"><span class="dot"></span>Кред. линии + овердрафт</div><div class="val dn">1,14 млн</div><div class="sub">5 линий под госконтракты</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Счета ИП</h3>
+      <div class="ent">
+        <div class="acct"><span><span class="pill ip">ИП</span> &nbsp;Т-Банк 1376 (основной)</span><span class="num dn">−46 799*</span></div>
+        <div class="acct"><span><span class="pill ip">ИП</span> &nbsp;ВТБ 2420</span><span class="num">~391</span></div>
+      </div>
+      <div class="note">*Подтверждено выпиской: остаток 1376 на 01.06 = <b>0</b> (вход. и исх. 0.00). Техминус в июне — это работа через овердрафт, а не пропущенный остаток. Наличной кассы нет.</div>
+    </div>
+    <div class="panel">
+      <h3>Дебиторка — нам должны клиенты <span class="hint">на 16.06 · топ из 20 · ₽</span></h3>
+      <table>
+        <tr><th>Клиент</th><th style="text-align:right">₽</th><th style="text-align:right">срок</th></tr>
+        <tr><td>ФКУ ИК-1 (Тамбов)</td><td class="num">544 000</td><td class="num muted">тс едет</td></tr>
+        <tr><td>ФГБУ «ВНИГНИ»</td><td class="num">480 000</td><td class="num muted">до 19.06</td></tr>
+        <tr><td>ИП Костюченко А.С.</td><td class="num">230 000</td><td class="num muted">по ориг.</td></tr>
+        <tr><td>ИП Хатипова А.Ф.</td><td class="num">211 600</td><td class="num dn">суд</td></tr>
+        <tr><td>ФКУ ИК-5 (МО)</td><td class="num">154 500</td><td class="num muted">до 19.06</td></tr>
+        <tr><td>… ещё 15 клиентов</td><td class="num muted">…</td><td></td></tr>
+      </table>
+      <div class="total pos"><span>ИТОГО Дт ИП</span><b style="color:var(--acc)">2 423 762</b></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Кредитные линии ИП <span class="hint">Т-Банк · под госконтракты · ₽</span></h3>
+      <div class="cgrid c3">
+        <div class="tile"><div class="nm">Линия 7024841307<small>до 22 ноя</small></div><div class="od">150 000</div></div>
+        <div class="tile"><div class="nm">Линия 7024804719<small>до 18 ноя</small></div><div class="od">250 000</div></div>
+        <div class="tile"><div class="nm">Линия 7024809817<small>до 15 фев 27</small></div><div class="od">256 955</div></div>
+        <div class="tile"><div class="nm">Линия 7021333431<small>до 7 фев 27</small></div><div class="od">275 079</div></div>
+        <div class="tile"><div class="nm">Линия 7032283419<small>до 9 фев 27</small></div><div class="od">170 000</div></div>
+        <div class="tile"><div class="nm">Овердрафт<small>блок. 10 июля</small></div><div class="od dn">42 606</div></div>
+      </div>
+      <div class="total"><span>ИТОГО кред. линии + овердрафт</span><b>1 144 641</b></div>
+    </div>
+    <div class="panel">
+      <h3>Кредиторка + бюджет ИП</h3>
+      <table>
+        <tr><th>Кому / за что</th><th style="text-align:right">₽</th></tr>
+        <tr><td>Перевозчикам (49: Чесноков 708к, Трасса 460к, Исмаилов 280к)</td><td class="num dn">2 942 672</td></tr>
+        <tr><td>Налоги ИП (не оплачено)</td><td class="num dn">170 000</td></tr>
+        <tr><td>Страхование грузов</td><td class="num dn">~30 000</td></tr>
+      </table>
+      <div class="note">Кредитные линии — комиссия 2,99% от суммы траншей.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ЛИЧНОЕ ============ -->
+<div class="view" id="v-fl">
+  <div class="kpis">
+    <div class="card fl"><div class="lbl"><span class="dot"></span>Личные счета</div><div class="val">~6 264</div><div class="sub">Озон 3 909 + Т-дебет 2 355</div></div>
+    <div class="card fl"><div class="lbl"><span class="dot"></span>Ипотека Сбер</div><div class="val dn">3,34 млн</div><div class="sub">20 053/мес · 25 лет · до 2055</div></div>
+    <div class="card fl"><div class="lbl"><span class="dot"></span>Кредитки</div><div class="val dn">~1,2 млн</div><div class="sub">Т-Банк + Сбер + Платинум</div></div>
+    <div class="card fl"><div class="lbl"><span class="dot"></span>Изъято из бизнеса</div><div class="val gd">372 762</div><div class="sub">июнь · переводы + покупки</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Изъятия из бизнеса на личное <span class="hint">июнь 1–15 · ₽</span></h3>
+      <div class="ent">
+        <div class="acct"><span><span class="pill fl">ЛИЧНОЕ</span> &nbsp;Переведено Эльвире на карты</span><span class="num">302 600</span></div>
+        <div class="acct"><span><span class="pill fl">ЛИЧНОЕ</span> &nbsp;Личные покупки картой ИП</span><span class="num">70 162</span></div>
+        <div class="acct" style="border-color:rgba(251,191,36,.3)"><span><b>Итого выведено</b></span><span class="num gd"><b>372 762</b></span></div>
+      </div>
+      <div class="note"><b>Разнесение (от Эльвиры):</b> переводы заказчиков на Озон *6194 и Т-дебет *4199 — это <b>выручка ИП</b> (ООО с налом не работает). Учитываем как доход ИП, прошедший транзитом через личную карту.</div>
+    </div>
+    <div class="panel">
+      <h3>Личные обязательства <span class="hint">не путать с бизнесом</span></h3>
+      <div class="cgrid c3">
+        <div class="tile"><div class="nm">Ипотека Сбер<small>семейная · 25 лет</small></div><div class="od dn">3,34 млн<small>20 053/мес до 2055</small></div></div>
+        <div class="tile"><div class="nm">Кредитка Т-Банк<small>самая большая</small></div><div class="od dn">~878 тыс<small>~26% годовых</small></div></div>
+        <div class="tile"><div class="nm">Кредитка Платинум *5103<small>лимит 325 тыс</small></div><div class="od dn">~346 тыс<small>проценты −15 011/мес</small></div></div>
+        <div class="tile"><div class="nm">Кредитка Сбер<small>+ дебетовая Сбер</small></div><div class="od muted">сумма?<small>уточняется выпиской</small></div></div>
+      </div>
+      <div class="note">Карта Альфа отдана отчиму (он же водитель грузовой) — вне периметра бизнеса.</div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+<b>Методология:</b> точка отсчёта — 01.06.2026, дальше текучка ведётся отдельно. Кэш-метод; переводы между своими счетами исключены; тело полученных кредитов доходом не считается. Остатки ООО на 01.06 сверены ПланФакт = УУ до рубля. По ИП/личному ПланФакт ненадёжен (дыры в истории), опираемся на выписки. <b>Уточнено Эльвирой (18.06):</b> остаток ИП 1376 на 01.06 = 0 + налички нет (выписка) · выручка с личных карт Озон/Т-дебет = доход ИП · оборотный кредит ООО = 3,27 млн (475 580/мес до 03.2027). <b>Источники:</b> ПланФакт (6 279 операций, 21 счёт), выписки банков, файлы дебиторки/кредиторки, график Поток №3676988, Google-таблица УУ.
+</div>
+</div>
+
+<script>
+const C = {teal:'#5eead4', indigo:'#818cf8', gold:'#fbbf24', red:'#fb7185', grn:'#34d399', mut:'#8b93a7', line:'rgba(255,255,255,.05)'};
+Chart.defaults.font.family = "'Manrope', sans-serif";
+Chart.defaults.color = C.mut;
+Chart.defaults.borderColor = C.line;
+
+// segmented tabs
+const tabs = document.querySelectorAll('.tab');
+const views = {all:'v-all', ooo:'v-ooo', ip:'v-ip', fl:'v-fl'};
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  Object.values(views).forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById(views[t.dataset.c]).classList.add('on');
+}));
+
+// summary chart: per contour деньги / Дт / Кт / долг (млн)
+new Chart(document.getElementById('sumChart'), {
+  type:'bar',
+  data:{labels:['ООО','ИП','Личное'],
+    datasets:[
+      {label:'Касса', data:[0.335,0,0.006], backgroundColor:'rgba(94,234,212,.8)', borderRadius:6, barPercentage:.7},
+      {label:'Дебиторка', data:[4.308,2.424,0], backgroundColor:'rgba(52,211,153,.5)', borderRadius:6, barPercentage:.7},
+      {label:'Кредиторка', data:[3.534,2.943,0], backgroundColor:'rgba(251,113,133,.6)', borderRadius:6, barPercentage:.7},
+      {label:'Долг банкам', data:[1.4,1.145,4.564], backgroundColor:'rgba(129,140,248,.55)', borderRadius:6, barPercentage:.7}
+    ]},
+  options:{maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw.toLocaleString('ru')+' млн ₽'}}},
+    scales:{y:{grid:{color:C.line}, ticks:{callback:v=>v+' млн'}}, x:{grid:{display:false}}}}
+});
+
+// динамика по месяцам (тыс ₽, обороты по ПланФакту; июнь по 18-е)
+new Chart(document.getElementById('dynChart'), {
+  type:'bar',
+  data:{labels:['Янв','Фев','Мар','Апр','Май','Июн*'],
+    datasets:[
+      {label:'Приход', data:[7638,6929,9440,7243,6576,4332], backgroundColor:'rgba(94,234,212,.82)', borderRadius:6, barPercentage:.62},
+      {label:'Расход', data:[7908,6988,9085,7325,5392,3894], backgroundColor:'rgba(251,113,133,.62)', borderRadius:6, barPercentage:.62}
+    ]},
+  options:{maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw/1000).toLocaleString('ru')+' млн ₽'}}},
+    scales:{y:{grid:{color:C.line}, ticks:{callback:v=>v/1000+' млн'}}, x:{grid:{display:false}}}}
+});
+</script>
+</body>
+</html>
