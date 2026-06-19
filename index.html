@@ -205,7 +205,7 @@ tr:hover td{background:rgba(94,234,212,.03)}
   </div>
 
   <div class="panel" style="margin-bottom:14px">
-    <h3>Динамика по месяцам 2026 <span class="hint">обороты (приход / расход), кэш по ПланФакту · июнь по 18-е</span></h3>
+    <h3>Валовая маржа по месяцам 2026 <span class="hint">маржа = выручка − перевозчики · красная линия = безубыточность (~1,7 млн) · июнь по 18-е</span></h3>
     <div class="chartbox" style="height:260px"><canvas id="dynChart"></canvas></div>
   </div>
 
@@ -636,13 +636,12 @@ new Chart(document.getElementById('sumChart'), {
     scales:{y:{grid:{color:C.line}, ticks:{callback:v=>v+' млн'}}, x:{grid:{display:false}}}}
 });
 
-// динамика по месяцам (тыс ₽, обороты по ПланФакту; июнь по 18-е)
+// валовая маржа по месяцам (тыс ₽, из ABC = выручка − перевозчики; июнь по 18-е) + линия безубыточности
 new Chart(document.getElementById('dynChart'), {
-  type:'bar',
   data:{labels:['Янв','Фев','Мар','Апр','Май','Июн*'],
     datasets:[
-      {label:'Приход', data:[7638,6929,9440,7243,6576,4332], backgroundColor:'rgba(94,234,212,.82)', borderRadius:6, barPercentage:.62},
-      {label:'Расход', data:[7908,6988,9085,7325,5392,3894], backgroundColor:'rgba(251,113,133,.62)', borderRadius:6, barPercentage:.62}
+      {type:'bar', label:'Валовая маржа', data:[259,364,729,583,1477,757], backgroundColor:'rgba(94,234,212,.82)', borderRadius:6, barPercentage:.55},
+      {type:'line', label:'Точка безубыточности (~1,7 млн)', data:[1710,1710,1710,1710,1710,1710], borderColor:C.red, borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false}
     ]},
   options:{maintainAspectRatio:false,
     plugins:{legend:{labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
