@@ -622,13 +622,13 @@ if(gb){ let sumTot=0, doneTot=0, ostTot=0;
   GOS.forEach(r=>{
     if(r[1]) sumTot+=r[1];
     if(r[3]) doneTot+=r[3];
-    ostTot+=r[5];
+    ostTot+=r[4];
     const pct = (r[1]&&r[3]!=null) ? Math.round(r[3]/r[1]*100)+'%' : '';
     gb.insertAdjacentHTML('beforeend',
       `<tr><td>${r[0]}</td>`+
       `<td class="num">${r[1]?fmt(r[1]):'<span class="muted">открытая</span>'}</td>`+
       `<td class="num">${r[3]!=null?fmt(r[3]):'—'}${pct?`<small style="color:var(--dim)"> · ${pct}</small>`:''}</td>`+
-      `<td class="num ${r[5]?'':'muted'}">${r[5]?fmt(r[5]):'—'}</td>`+
+      `<td class="num ${r[4]?'':'muted'}">${r[4]?fmt(r[4]):'—'}</td>`+
       `<td style="text-align:center;font-size:11px;color:var(--dim)">${r[2]}</td>`+
       `<td style="font-size:11px;color:${/факторинг/.test(r[5])||/штраф/.test(r[5])?'var(--red)':'var(--mut)'}">${r[5]}</td></tr>`);
   });
